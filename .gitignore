@@ -1,0 +1,26 @@
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+frontend/*.local
+
+# Backend (ML API)
+ml-api/venv/
+ml-api/env/
+ml-api/__pycache__/
+ml-api/*.pyc
+ml-api/.env
+ml-api/.pytest_cache/
+ml-api/model.pkl
+ml-api/scaler.pkl
+
+# Firebase
+frontend/.firebase/
+frontend/firebase-debug.log
+
+# IDE / OS Files
+.vscode/
+.idea/
+.DS_Store
+*.log

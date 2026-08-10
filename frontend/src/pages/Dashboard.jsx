@@ -316,25 +316,25 @@ export default function Dashboard() {
           </div>
 
           {/* Caseworker Assignment Card */}
-          <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 p-5 rounded-2xl card-shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-colors">
-            <div className="flex items-center gap-4">
-              <div className={`p-3 rounded-xl ${caseworker ? 'bg-health-50 dark:bg-health-950/20 text-health-500' : 'bg-amber-50 dark:bg-amber-950/20 text-amber-500'}`}>
-                {caseworker ? <UserCheck size={24} /> : <UserPlus size={24} />}
+          <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 p-4 sm:p-5 rounded-2xl card-shadow flex flex-col gap-4 transition-colors">
+            <div className="flex items-start gap-3 min-w-0">
+              <div className={`p-2.5 rounded-xl shrink-0 ${caseworker ? 'bg-health-50 dark:bg-health-950/20 text-health-500' : 'bg-amber-50 dark:bg-amber-950/20 text-amber-500'}`}>
+                {caseworker ? <UserCheck size={20} /> : <UserPlus size={20} />}
               </div>
-              <div className="min-w-0">
-                <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm truncate">
-                  {caseworker ? `Assigned Caseworker: Dr./Nurse ${caseworker.name}` : 'No Healthcare Caseworker Assigned'}
+              <div className="min-w-0 flex-1">
+                <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug break-words">
+                  {caseworker ? `Assigned: Dr./Nurse ${caseworker.name}` : 'No Caseworker Assigned'}
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate max-w-xl">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words leading-relaxed">
                   {caseworker 
-                    ? `Contact: ${caseworker.email} | Receives your vital assessment logs automatically.` 
-                    : 'Assign a health worker to review your AI-predicted pregnancy risk logs.'}
+                    ? `${caseworker.email} — Receives your vital logs automatically.` 
+                    : 'Assign a health worker to monitor your pregnancy risk assessments.'}
                 </p>
               </div>
             </div>
             <button
               onClick={() => setCaseworkerModalOpen(true)}
-              className={`px-4 py-2.5 text-xs font-bold rounded-xl transition shrink-0 ${
+              className={`w-full sm:w-auto self-start px-4 py-2.5 text-xs font-bold rounded-xl transition ${
                 caseworker 
                   ? 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600' 
                   : 'bg-health-600 text-white hover:bg-health-700 shadow-sm shadow-health-100 dark:shadow-none'
@@ -343,6 +343,7 @@ export default function Dashboard() {
               {caseworker ? 'Change Caseworker' : 'Assign Caseworker'}
             </button>
           </div>
+
 
           {/* Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">

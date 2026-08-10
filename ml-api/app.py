@@ -5,8 +5,13 @@ import numpy as np
 import os
 
 app = Flask(__name__)
-# Enable CORS for localhost:5173
-CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}})
+
+# CORS: Allow the frontend origin (set CORS_ORIGIN env var in production, defaults to all)
+allowed_origins = os.environ.get("CORS_ORIGIN", "*")
+if allowed_origins != "*":
+    allowed_origins = [o.strip() for o in allowed_origins.split(",")]
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
+
 
 # Load model and scaler once at startup
 model_path = 'model.pkl'

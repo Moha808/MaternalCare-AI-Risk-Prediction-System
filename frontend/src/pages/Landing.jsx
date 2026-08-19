@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import Footer from '../components/Footer';
 import {
   Sun, Moon, Heart, Activity, Users, Shield, ArrowRight,
   CheckCircle2, Sparkles, ShieldCheck, TrendingUp, Bell, Star
@@ -281,17 +282,7 @@ export default function Landing() {
       </section>
 
       {/* ───── FOOTER ───── */}
-      <footer className="py-10 px-6 bg-slate-900 dark:bg-slate-950 text-slate-400 border-t border-slate-800 transition-colors">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-health-600 to-teal-500 flex items-center justify-center text-white font-black text-sm">
-              M
-            </div>
-            <span className="font-bold text-slate-300 text-sm">MaternalCare Risk Prediction System</span>
-          </div>
-          <span className="text-xs font-semibold">© {new Date().getFullYear()} MaternalCare System. All rights reserved.</span>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

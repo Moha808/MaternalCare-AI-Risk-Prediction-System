@@ -13,6 +13,7 @@ import Modal from '../components/Modal';
 
 const schema = z.object({
   age: z.coerce.number().int("Age must be a whole number").min(10, "Age must be between 10 and 70").max(70, "Age must be between 10 and 70"),
+  gestationalAge: z.coerce.number().int("Must be a whole number").min(4, "Must be at least 4 weeks").max(43, "Must be less than 44 weeks"),
   systolicBP: z.coerce.number().int("Systolic BP must be a whole number").min(70, "Systolic BP must be between 70 and 180 mmHg").max(180, "Systolic BP must be between 70 and 180 mmHg"),
   diastolicBP: z.coerce.number().int("Diastolic BP must be a whole number").min(50, "Diastolic BP must be between 50 and 120 mmHg").max(120, "Diastolic BP must be between 50 and 120 mmHg"),
   bs: z.coerce.number().min(6.0, "Blood Sugar must be between 6.0 and 20.0 mmol/L").max(20.0, "Blood Sugar must be between 6.0 and 20.0 mmol/L"),
@@ -86,6 +87,7 @@ export default function AssessmentNew() {
         id: assessmentId,
         patientId: currentUser.uid,
         age: data.age,
+        gestationalAge: data.gestationalAge,
         systolicBP: data.systolicBP,
         diastolicBP: data.diastolicBP,
         bs: data.bs,
@@ -93,6 +95,7 @@ export default function AssessmentNew() {
         heartRate: data.heartRate,
         riskLevel: prediction.riskLevel,
         confidence: prediction.confidence,
+        suggestions: prediction.suggestions || [],
         symptoms: selectedSymptoms,
         createdAt,
         createdBy: currentUser.uid
@@ -111,12 +114,13 @@ export default function AssessmentNew() {
         if (hasSevereSymptoms) {
           alertMessage += ` Active symptoms: ${selectedSymptoms.join(', ')}.`;
         }
-
+        
         const alertDoc = {
           id: alertId,
           patientId: currentUser.uid,
           riskLevel: isHighRisk ? prediction.riskLevel : 'mid risk', // Elevate to alert
           message: alertMessage,
+          aiSuggestions: prediction.suggestions || [],
           acknowledged: false,
           createdAt
         };
@@ -157,26 +161,38 @@ export default function AssessmentNew() {
         {/* Vitals Form */}
         <div className="lg:col-span-7 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 p-6 sm:p-8 rounded-2xl card-shadow transition-colors">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {/* Age */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Patient Age (years)</label>
+              <div className="flex flex-col justify-end">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Patient Age (years)</label>
                 <input
                   type="number"
                   {...register('age')}
-                  className={`mt-1 block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.age ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
+                  className={`block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.age ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
                   placeholder="25"
                 />
                 {errors.age && <p className="mt-1 text-xs font-semibold text-red-500">{errors.age.message}</p>}
               </div>
 
+              {/* Gestational Age */}
+              <div className="flex flex-col justify-end">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Gestational Age (weeks)</label>
+                <input
+                  type="number"
+                  {...register('gestationalAge')}
+                  className={`block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.gestationalAge ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
+                  placeholder="24"
+                />
+                {errors.gestationalAge && <p className="mt-1 text-xs font-semibold text-red-500">{errors.gestationalAge.message}</p>}
+              </div>
+
               {/* Heart Rate */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Heart Rate (bpm)</label>
+              <div className="flex flex-col justify-end">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Heart Rate (bpm)</label>
                 <input
                   type="number"
                   {...register('heartRate')}
-                  className={`mt-1 block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.heartRate ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
+                  className={`block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.heartRate ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
                   placeholder="72"
                 />
                 {errors.heartRate && <p className="mt-1 text-xs font-semibold text-red-500">{errors.heartRate.message}</p>}
@@ -185,24 +201,24 @@ export default function AssessmentNew() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Systolic BP */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Systolic BP (mmHg)</label>
+              <div className="flex flex-col justify-end">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Systolic BP (mmHg)</label>
                 <input
                   type="number"
                   {...register('systolicBP')}
-                  className={`mt-1 block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.systolicBP ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
+                  className={`block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.systolicBP ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
                   placeholder="120"
                 />
                 {errors.systolicBP && <p className="mt-1 text-xs font-semibold text-red-500">{errors.systolicBP.message}</p>}
               </div>
 
               {/* Diastolic BP */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Diastolic BP (mmHg)</label>
+              <div className="flex flex-col justify-end">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Diastolic BP (mmHg)</label>
                 <input
                   type="number"
                   {...register('diastolicBP')}
-                  className={`mt-1 block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.diastolicBP ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
+                  className={`block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.diastolicBP ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
                   placeholder="80"
                 />
                 {errors.diastolicBP && <p className="mt-1 text-xs font-semibold text-red-500">{errors.diastolicBP.message}</p>}
@@ -211,26 +227,26 @@ export default function AssessmentNew() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Blood Sugar */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Blood Sugar (mmol/L)</label>
+              <div className="flex flex-col justify-end">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Blood Sugar (mmol/L)</label>
                 <input
                   type="number"
                   step="0.1"
                   {...register('bs')}
-                  className={`mt-1 block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.bs ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
+                  className={`block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.bs ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
                   placeholder="7.0"
                 />
                 {errors.bs && <p className="mt-1 text-xs font-semibold text-red-500">{errors.bs.message}</p>}
               </div>
 
               {/* Body Temp */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Body Temp (°F)</label>
+              <div className="flex flex-col justify-end">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Body Temp (°F)</label>
                 <input
                   type="number"
                   step="0.1"
                   {...register('bodyTemp')}
-                  className={`mt-1 block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.bodyTemp ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
+                  className={`block w-full px-4 py-3 border rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-health-400 dark:focus:ring-health-500 focus:border-transparent transition ${errors.bodyTemp ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700'}`}
                   placeholder="98.6"
                 />
                 {errors.bodyTemp && <p className="mt-1 text-xs font-semibold text-red-500">{errors.bodyTemp.message}</p>}
@@ -257,14 +273,18 @@ export default function AssessmentNew() {
                     key={item.key}
                     type="button"
                     onClick={() => toggleSymptom(item.key)}
-                    className="flex items-center gap-3 p-3 rounded-xl border text-left text-xs font-semibold transition bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-health-400 dark:hover:border-health-500"
+                    className={`flex items-center gap-3 p-3.5 rounded-xl border text-left text-xs font-bold transition-all ${
+                      symptoms[item.key]
+                        ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 shadow-sm'
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
                   >
                     {symptoms[item.key] ? (
-                      <CheckSquare className="text-health-500 h-5 w-5 shrink-0" />
+                      <CheckSquare className="text-red-600 dark:text-red-400 h-5 w-5 shrink-0" />
                     ) : (
                       <Square className="text-slate-400 h-5 w-5 shrink-0" />
                     )}
-                    <span className="text-slate-700 dark:text-slate-200 leading-tight">{item.label}</span>
+                    <span className="leading-tight">{item.label}</span>
                   </button>
                 ))}
               </div>
@@ -361,6 +381,22 @@ export default function AssessmentNew() {
                   ))}
                 </div>
               </div>
+
+              {/* AI Clinical Suggestions */}
+              {result.suggestions && result.suggestions.length > 0 && (
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-700/80 space-y-3">
+                  <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-2">
+                    <Activity size={14} /> AI Clinical Suggestions
+                  </h4>
+                  <div className="space-y-2">
+                    {result.suggestions.map((suggestion, idx) => (
+                      <div key={idx} className="p-3 bg-health-50 dark:bg-health-950/20 border border-health-100 dark:border-health-900/50 rounded-xl text-xs text-health-800 dark:text-health-300 font-medium leading-relaxed">
+                        {suggestion}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="pt-4 border-t border-slate-100 dark:border-slate-700/80">
                 <button

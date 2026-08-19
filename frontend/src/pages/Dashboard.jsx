@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase/config';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { Activity, Users, Bell, FileText, Plus, UserPlus, Heart, Thermometer, ShieldAlert, CheckCircle, UserCheck, Calendar } from 'lucide-react';
+import { Activity, Users, Bell, FileText, Plus, UserPlus, Heart, Thermometer, ShieldAlert, CheckCircle, UserCheck, Calendar, ArrowRight } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import RiskBadge from '../components/RiskBadge';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -394,10 +394,14 @@ export default function Dashboard() {
             </div>
             
             {recentAssessments.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 dark:text-slate-500">
-                <p className="text-sm">You haven't run any health risk predictions yet.</p>
-                <Link to="/assessment/new" className="mt-4 inline-block text-sm font-bold text-health-600 dark:text-health-500 hover:underline">
-                  Create your first assessment &rarr;
+              <div className="p-12 text-center text-slate-400 dark:text-slate-500 flex flex-col items-center justify-center">
+                <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 border border-slate-100 dark:border-slate-700">
+                  <Activity size={28} className="text-slate-300 dark:text-slate-600" />
+                </div>
+                <h4 className="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">No Assessments Found</h4>
+                <p className="text-sm max-w-sm">You haven't run any health risk predictions yet. Submitting vitals regularly helps your caseworker monitor your pregnancy.</p>
+                <Link to="/assessment/new" className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-health-600 hover:bg-health-700 text-white text-xs font-bold rounded-xl transition shadow-sm shadow-health-600/20">
+                  Create First Assessment <ArrowRight size={14} />
                 </Link>
               </div>
             ) : (

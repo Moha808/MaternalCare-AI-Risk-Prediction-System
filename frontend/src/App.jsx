@@ -15,6 +15,9 @@ import Patients from './pages/Patients';
 import PatientDetail from './pages/PatientDetail';
 import Alerts from './pages/Alerts';
 import Profile from './pages/Profile';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Hipaa from './pages/Hipaa';
 
 export default function App() {
   return (
@@ -26,6 +29,9 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Login isAdminRoute={true} />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/hipaa" element={<Hipaa />} />
 
           {/* Protected Routes (Authenticated Users) */}
           <Route

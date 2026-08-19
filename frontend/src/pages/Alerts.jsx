@@ -212,7 +212,20 @@ export default function Alerts() {
                   )}
                 </div>
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 leading-relaxed">{alert.message}</p>
-                <div className="flex items-center gap-4 text-xs font-semibold text-slate-400 dark:text-slate-500">
+                
+                {/* AI Suggestions rendering */}
+                {alert.aiSuggestions && alert.aiSuggestions.length > 0 && !isPatient && (
+                  <div className="mt-3 p-3 bg-health-50/50 dark:bg-health-950/10 border border-health-100 dark:border-health-900/30 rounded-lg space-y-1">
+                    <h5 className="text-[10px] font-bold text-health-600 dark:text-health-400 uppercase tracking-wider mb-2">AI Clinical Suggestions</h5>
+                    <ul className="list-disc pl-4 space-y-1">
+                      {alert.aiSuggestions.map((sugg, idx) => (
+                        <li key={idx} className="text-xs font-medium text-slate-700 dark:text-slate-300">{sugg}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-4 text-xs font-semibold text-slate-400 dark:text-slate-500 mt-2">
                   <span className="flex items-center gap-1">
                     <Calendar size={13} /> {new Date(alert.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
                   </span>

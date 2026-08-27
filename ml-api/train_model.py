@@ -23,6 +23,7 @@ def main():
     
     # Handle outliers (e.g. SystolicBP, DiastolicBP, BS, BodyTemp, HeartRate - clamping to plausible ranges)
     df['Age'] = df['Age'].clip(10, 70)
+    df['GestationalAge'] = df['GestationalAge'].clip(4, 43)
     df['SystolicBP'] = df['SystolicBP'].clip(70, 180)
     df['DiastolicBP'] = df['DiastolicBP'].clip(50, 120)
     df['BS'] = df['BS'].clip(6.0, 20.0)
@@ -30,7 +31,7 @@ def main():
     df['HeartRate'] = df['HeartRate'].clip(40, 140)
     
     # Features and Target
-    X = df[['Age', 'SystolicBP', 'DiastolicBP', 'BS', 'BodyTemp', 'HeartRate']]
+    X = df[['Age', 'GestationalAge', 'SystolicBP', 'DiastolicBP', 'BS', 'BodyTemp', 'HeartRate']]
     y = df['RiskLevel']
     
     # Split train/test (stratified, 80/20)

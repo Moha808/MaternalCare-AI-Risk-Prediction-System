@@ -23,25 +23,25 @@ def main():
         if status == 0: # Healthy / Low Risk
             sys = int(np.random.normal(110, 8))
             dia = int(np.random.normal(72, 6))
-            sugar = round(np.random.uniform(6.0, 7.8), 1)
+            sugar = round(np.random.uniform(4.0, 7.5), 1)
             temp = round(np.random.uniform(98.0, 98.6), 1)
             hr = int(np.random.normal(72, 5))
         elif status == 1: # Moderate / Mid Risk
             sys = int(np.random.normal(125, 10))
             dia = int(np.random.normal(82, 8))
-            sugar = round(np.random.uniform(7.2, 10.5), 1)
+            sugar = round(np.random.uniform(7.6, 11.0), 1)
             temp = round(np.random.uniform(98.0, 99.8), 1)
             hr = int(np.random.normal(80, 8))
         else: # Severe / High Risk
             sys = int(np.random.normal(142, 12))
             dia = int(np.random.normal(92, 10))
-            sugar = round(np.random.uniform(10.0, 19.0), 1)
+            sugar = round(np.random.uniform(11.1, 20.0), 1)
             temp = round(np.random.choice([np.random.uniform(98.0, 99.0), np.random.uniform(100.0, 103.0)], p=[0.4, 0.6]), 1)
             hr = int(np.random.normal(90, 10))
             
         sys = max(70, min(180, sys))
         dia = max(50, min(120, dia))
-        sugar = max(6.0, min(19.0, sugar))
+        sugar = max(3.0, min(30.0, sugar))
         temp = max(98.0, min(103.0, temp))
         hr = max(60, min(120, hr))
         
@@ -52,12 +52,17 @@ def main():
         heart_rate.append(hr)
 
     risk_levels = []
+    gestational_age = []
     for i in range(n_samples):
         sys = systolic_bp[i]
         dia = diastolic_bp[i]
         sugar = bs[i]
         temp = body_temp[i]
         age_val = age[i]
+        
+        # Gestational age (weeks)
+        ga = np.random.randint(4, 43)
+        gestational_age.append(ga)
         
         # Calculate risk score
         score = 0
@@ -77,6 +82,10 @@ def main():
         if age_val >= 38 or age_val <= 17:
             score += 1
             
+        # Add risk if high BP occurs in late pregnancy (preeclampsia risk)
+        if (sys >= 130 or dia >= 85) and ga >= 20:
+            score += 2
+            
         if score >= 4:
             risk = 'high risk'
         elif score >= 1:
@@ -88,6 +97,7 @@ def main():
 
     df = pd.DataFrame({
         'Age': age,
+        'GestationalAge': gestational_age,
         'SystolicBP': systolic_bp,
         'DiastolicBP': diastolic_bp,
         'BS': bs,

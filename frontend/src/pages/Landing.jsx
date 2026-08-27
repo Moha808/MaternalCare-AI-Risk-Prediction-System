@@ -231,9 +231,9 @@ export default function Landing() {
               </thead>
               <tbody className="text-sm font-medium">
                 {[
-                  { level: 'Low Risk', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', systolic: '< 120 mmHg', diastolic: '< 80 mmHg', bs: '6.0–7.5 mmol/L', action: 'Routine monitoring. Symptoms logged.' },
-                  { level: 'Mid Risk', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', systolic: '120–139 mmHg', diastolic: '80–89 mmHg', bs: '7.6–10 mmol/L', action: 'Provider consultation recommended.' },
-                  { level: 'High Risk', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-500/10', systolic: '≥ 140 mmHg', diastolic: '≥ 90 mmHg', bs: '≥ 10.1 mmol/L', action: 'Instant alert dispatched to caseworker.' },
+                  { level: 'Low Risk', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', systolic: '< 120 mmHg', diastolic: '< 80 mmHg', bs: '4.0–7.5 mmol/L', action: 'Routine monitoring. Symptoms logged.' },
+                  { level: 'Mid Risk', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', systolic: '120–139 mmHg', diastolic: '80–89 mmHg', bs: '7.6–11.0 mmol/L', action: 'Provider consultation recommended.' },
+                  { level: 'High Risk', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-500/10', systolic: '≥ 140 mmHg', diastolic: '≥ 90 mmHg', bs: '≥ 11.1 mmol/L', action: 'Instant alert dispatched to caseworker.' },
                 ].map((row, i) => (
                   <tr key={i} className="border-b border-slate-200 dark:border-slate-700 last:border-0 hover:bg-white dark:hover:bg-slate-800 transition-colors">
                     <td className="px-6 py-5">

@@ -47,13 +47,14 @@ def predict():
         return jsonify({"error": "No JSON data provided"}), 400
 
     # Required fields
-    required_fields = ['age', 'systolicBP', 'diastolicBP', 'bs', 'bodyTemp', 'heartRate']
+    required_fields = ['age', 'gestationalAge', 'systolicBP', 'diastolicBP', 'bs', 'bodyTemp', 'heartRate']
     for f in required_fields:
         if f not in data:
             return jsonify({"error": f"Missing required field: {f}"}), 400
 
     try:
         age = float(data['age'])
+        ga = float(data['gestationalAge'])
         sys = float(data['systolicBP'])
         dia = float(data['diastolicBP'])
         bs_val = float(data['bs'])
@@ -62,27 +63,21 @@ def predict():
     except (ValueError, TypeError):
         return jsonify({"error": "All vitals must be numeric values"}), 400
 
-    # Range validation (UCI dataset is Age: 10-70, SystolicBP: 70-160, DiastolicBP: 50-100, BS: 6.0-19.0, Temp: 98-103, HR: 7-90?)
-    # Let's use broader ranges to accommodate medical variations while preventing extremes
+    # Range validation
     errors = []
-    if not (10 <= age <= 70):
-        errors.append("Age must be between 10 and 70")
-    if not (70 <= sys <= 180):
-        errors.append("SystolicBP must be between 70 and 180 mmHg")
-    if not (50 <= dia <= 120):
-        errors.append("DiastolicBP must be between 50 and 120 mmHg")
-    if not (6.0 <= bs_val <= 20.0):
-        errors.append("Blood Sugar (BS) must be between 6.0 and 20.0 mmol/L")
-    if not (95.0 <= temp <= 105.0):
-        errors.append("Body Temperature must be between 95.0 and 105.0 F")
-    if not (40 <= hr <= 140):
-        errors.append("Heart Rate must be between 40 and 140 bpm")
+    if not (10 <= age <= 70): errors.append("Age must be between 10 and 70")
+    if not (4 <= ga <= 43): errors.append("Gestational Age must be between 4 and 43 weeks")
+    if not (70 <= sys <= 180): errors.append("SystolicBP must be between 70 and 180 mmHg")
+    if not (50 <= dia <= 120): errors.append("DiastolicBP must be between 50 and 120 mmHg")
+    if not (2.0 <= bs_val <= 30.0): errors.append("Blood Sugar (BS) must be between 2.0 and 30.0 mmol/L")
+    if not (95.0 <= temp <= 105.0): errors.append("Body Temperature must be between 95.0 and 105.0 F")
+    if not (40 <= hr <= 140): errors.append("Heart Rate must be between 40 and 140 bpm")
 
     if errors:
         return jsonify({"error": "Validation errors", "messages": errors}), 400
 
-    # Prepare features for prediction
-    features = np.array([[age, sys, dia, bs_val, temp, hr]])
+    # Prepare features for prediction (Must match training order: Age, GestationalAge, SystolicBP, DiastolicBP, BS, BodyTemp, HeartRate)
+    features = np.array([[age, ga, sys, dia, bs_val, temp, hr]])
     
     # Scale features
     features_scaled = scaler.transform(features)
@@ -95,14 +90,35 @@ def predict():
     pred_idx = np.argmax(probs)
     risk_level = classes[pred_idx]
     confidence = float(probs[pred_idx])
-    
-    # Map probabilities to class names
     probs_dict = {str(classes[i]): float(probs[i]) for i in range(len(classes))}
+
+    # Generate AI Clinical Suggestions
+    suggestions = []
+    if risk_level in ['mid risk', 'high risk']:
+        if sys >= 140 or dia >= 90:
+            if ga >= 20:
+                suggestions.append("⚠️ Suspected Preeclampsia. Recommend immediate urine protein test, lab evaluation of liver/kidney function, and consider starting oral antihypertensives (e.g., Labetalol or Nifedipine) per protocol.")
+            else:
+                suggestions.append("⚠️ Chronic Hypertension detected. Monitor closely and consider baseline preeclampsia labs.")
+        if bs_val >= 11.0:
+            suggestions.append("⚠️ Severe Hyperglycemia. Screen for Gestational Diabetes. Recommend fasting blood glucose test and possible insulin therapy consultation.")
+        elif bs_val >= 7.8:
+            suggestions.append("⚠️ Elevated Blood Sugar. Recommend Oral Glucose Tolerance Test (OGTT) and dietary counseling.")
+        if temp >= 100.4:
+            suggestions.append("⚠️ Clinical Fever. Screen for maternal infection (UTI, Chorioamnionitis). Recommend CBC, blood cultures if persistent, and appropriate antipyretics/antibiotics.")
+        if hr > 100:
+            suggestions.append("⚠️ Maternal Tachycardia. Assess for dehydration, fever, or underlying cardiac issues. Recommend IV hydration and ECG if symptomatic.")
+
+    if not suggestions and risk_level == 'low risk':
+        suggestions.append("✅ Vitals are within normal ranges. Continue routine prenatal care and standard daily vitamins (Folic acid, Iron).")
+    elif not suggestions:
+        suggestions.append("⚠️ Vitals indicate some risk. Schedule a follow-up consultation to evaluate maternal health status.")
 
     return jsonify({
         "riskLevel": risk_level,
         "confidence": confidence,
-        "probabilities": probs_dict
+        "probabilities": probs_dict,
+        "suggestions": suggestions
     })
 
 if __name__ == '__main__':

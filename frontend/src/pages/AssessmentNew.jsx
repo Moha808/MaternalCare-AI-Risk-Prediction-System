@@ -75,7 +75,15 @@ export default function AssessmentNew() {
       }
 
       const prediction = await response.json();
-      setResult(prediction);
+      
+      // Calculate Estimated Due Date (EDD)
+      const ga = parseInt(data.gestationalAge, 10);
+      const weeksRemaining = Math.max(0, 40 - ga);
+      const eddDate = new Date();
+      eddDate.setDate(eddDate.getDate() + (weeksRemaining * 7));
+      const eddString = eddDate.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      setResult({ ...prediction, estimatedDueDate: eddString, gestationalAge: ga });
 
       // 2. Save assessment to Firestore (including checklist)
       const assessmentId = doc(collection(db, 'assessments')).id;
@@ -367,6 +375,15 @@ export default function AssessmentNew() {
                     style={{ width: `${result.confidence * 100}%` }}
                   ></div>
                 </div>
+              </div>
+
+              {/* Estimated Due Date Panel */}
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-700/80 space-y-2">
+                <div className="flex justify-between items-center text-xs font-bold">
+                  <span className="text-teal-600 dark:text-teal-400 uppercase tracking-wide">Estimated Due Date</span>
+                  <span className="text-slate-800 dark:text-slate-200 bg-teal-50 dark:bg-teal-900/20 px-2 py-1 rounded-md">{result.estimatedDueDate}</span>
+                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">Calculated based on the {result.gestationalAge} weeks gestational age provided today.</p>
               </div>
 
               {/* Probabilities Breakdown */}

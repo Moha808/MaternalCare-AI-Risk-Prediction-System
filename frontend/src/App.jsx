@@ -77,11 +77,11 @@ export default function App() {
             }
           />
 
-          {/* Health Worker-Only Routes */}
+          {/* Health Worker & Admin Routes */}
           <Route
             path="/patients"
             element={
-              <ProtectedRoute allowedRoles={['health_worker']}>
+              <ProtectedRoute allowedRoles={['health_worker', 'admin']}>
                 <Layout>
                   <Patients />
                 </Layout>
@@ -91,7 +91,7 @@ export default function App() {
           <Route
             path="/patient/:id"
             element={
-              <ProtectedRoute allowedRoles={['health_worker']}>
+              <ProtectedRoute allowedRoles={['health_worker', 'admin']}>
                 <Layout>
                   <PatientDetail />
                 </Layout>

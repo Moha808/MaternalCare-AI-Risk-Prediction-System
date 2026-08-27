@@ -8,12 +8,21 @@ export function useTheme() {
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      return savedTheme;
+    try {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        return savedTheme;
+      }
+    } catch (e) {
+      console.warn('localStorage access denied');
     }
-    const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return userPrefersDark ? 'dark' : 'light';
+    
+    // Fallback to media query
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return userPrefersDark ? 'dark' : 'light';
+    }
+    return 'light';
   });
 
   useEffect(() => {
@@ -23,7 +32,11 @@ export function ThemeProvider({ children }) {
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (e) {
+      console.warn('localStorage access denied');
+    }
   }, [theme]);
 
   const toggleTheme = () => {

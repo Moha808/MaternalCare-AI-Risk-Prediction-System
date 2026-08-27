@@ -261,7 +261,15 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 text-slate-500 dark:text-slate-400">
                       {u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' }) : 'N/A'}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
+                      {u.role === 'patient' && (
+                        <a 
+                          href={`/patient/${u.uid}`}
+                          className="px-3 py-1.5 text-[10px] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/20 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/40 transition"
+                        >
+                          View History
+                        </a>
+                      )}
                       {u.role === 'admin' ? (
                         <span className="text-xs text-slate-400 dark:text-slate-600 italic">System Protected</span>
                       ) : (

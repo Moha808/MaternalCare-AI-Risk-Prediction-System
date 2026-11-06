@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Mail, Lock, AlertCircle, Eye, EyeOff, Sun, Moon } from 'lucide-react';
-
 const ROLES = [
   { key: 'patient', label: 'Patient', desc: 'Access your maternal health records and vitals tracker.' },
   { key: 'health_worker', label: 'Health Worker', desc: 'Monitor assigned patient records and critical alerts.' },
@@ -159,6 +158,16 @@ export default function Login({ isAdminRoute = false }) {
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
+              </div>
+
+              {/* Forgot Password */}
+              <div className="flex justify-end -mt-2">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-semibold text-health-600 hover:text-health-700 dark:text-health-400 dark:hover:text-health-300 transition-colors"
+                >
+                  Forgot password?
+                </Link>
               </div>
 
               {/* Submit */}

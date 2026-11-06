@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Hipaa from './pages/Hipaa';
+import ForgotPassword from './pages/ForgotPassword';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/hipaa" element={<Hipaa />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Protected Routes (Authenticated Users) */}
           <Route
